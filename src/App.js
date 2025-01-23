@@ -1,3 +1,4 @@
+//App.js
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import ReactMarkdown from 'react-markdown';
@@ -7,74 +8,202 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [chats, setChats] = useState([]);
+  const [activeChat, setActiveChat] = useState(null);
+  const [editChatId, setEditChatId] = useState(null); // For editing chat title
+  const [editedTitle, setEditedTitle] = useState(''); 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const toggleTheme = () => {
+    setIsDarkMode((prevState) => !prevState);
+  };// Temporary title for editing
   const messagesEndRef = useRef(null);
 
-  // Load messages from localStorage when the component mounts
+  // Load chats and messages from localStorage
   useEffect(() => {
-    const savedMessages = JSON.parse(localStorage.getItem('messages'));
-    if (savedMessages) {
-      setMessages(savedMessages);
+    try {
+      const savedChats = JSON.parse(localStorage.getItem('chats')) || [];
+      if (savedChats.length > 0) {
+        setChats(savedChats);
+        setActiveChat(savedChats[0].id);
+        setMessages(savedChats[0].messages);
+      } else {
+        const defaultChat = { id: Date.now(), title: 'Chat 1', messages: [] };
+        const initialChats = [defaultChat];
+        setChats(initialChats);
+        setActiveChat(defaultChat.id);
+        localStorage.setItem('chats', JSON.stringify(initialChats));
+      }
+    } catch (error) {
+      console.error("Error loading chats from localStorage:", error);
     }
   }, []);
 
-  // Scroll to the bottom when the messages update
+  // Save chats to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('chats', JSON.stringify(chats));
+    } catch (error) {
+      console.error("Error saving chats to localStorage:", error);
+    }
+  }, [chats]);
+  
+  useEffect(() => {
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  }, [isDarkMode]);
+
+  // Auto-scroll to the bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    // Store the updated messages in localStorage
-    if (messages.length > 0) {
-      localStorage.setItem('messages', JSON.stringify(messages));
-    }
   }, [messages]);
 
   const handleMessageSend = async () => {
     if (input.trim() !== '') {
-      const newMessage = { text: input, sender: 'user' };
-      setMessages(prevMessages => [...prevMessages, newMessage]);
+      const userMessage = { text: input, sender: 'user' };
+      const updatedMessages = [...messages, userMessage];
+      setMessages(updatedMessages);
+
+      const updatedChats = chats.map(chat =>
+        chat.id === activeChat ? { ...chat, messages: updatedMessages } : chat
+      );
+      setChats(updatedChats);
       setInput('');
 
-      // Safety and generation configurations
-      const safetySettings = [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-        },
-      ];
-      const generationConfig = {
-        stopSequences: ["red"],
-        maxOutputTokens: 200,
-        temperature: 0.9,
-        topP: 0.1,
-        topK: 16,
-      };
-
       try {
+        const safetySettings = [
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+        ];
+        const generationConfig = { maxOutputTokens: 200, temperature: 0.9, topP: 0.1, topK: 16 };
+
         const genAI = new GoogleGenerativeAI("AIzaSyBJylVYTnYcqqzdOd4BuDO4M_xclNiyqrg");
         const model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings, generationConfig });
         const chat = model.startChat();
         const result = await chat.sendMessage(input);
-        const response = await result.response;
-        const text = response.text();
-        const botMessage = { text: text, sender: 'bot' };
-        setMessages(prevMessages => [...prevMessages, botMessage]);
+        const botMessage = { text: result.response.text(), sender: 'bot' };
+
+        const updatedMessagesWithBot = [...updatedMessages, botMessage];
+        setMessages(updatedMessagesWithBot);
+
+        const updatedChatsWithBot = chats.map(chat =>
+          chat.id === activeChat ? { ...chat, messages: updatedMessagesWithBot } : chat
+        );
+        setChats(updatedChatsWithBot);
       } catch (error) {
-        console.error("Error sending message to bot:", error);
+        console.error("Error with AI response:", error);
+        const errorMessage = { text: "Oops! Something went wrong. Please try again.", sender: 'bot' };
+        setMessages([...updatedMessages, errorMessage]);
       }
     }
   };
 
-  const handleResetChat = () => {
-    // Reset the state and clear messages from localStorage
+  const handleNewChat = () => {
+    const newChat = { id: Date.now(), title: `Chat ${chats.length + 1}`, messages: [] };
+    setChats([newChat, ...chats]);
+    setActiveChat(newChat.id);
     setMessages([]);
-    localStorage.removeItem('messages');
+  };
+
+  const handleChatSelect = (chatId) => {
+    const selectedChat = chats.find(chat => chat.id === chatId);
+    setActiveChat(chatId);
+    setMessages(selectedChat?.messages || []);
+  };
+
+  const handleChatDelete = (chatId) => {
+    const updatedChats = chats.filter(chat => chat.id !== chatId);
+    setChats(updatedChats);
+
+    if (activeChat === chatId && updatedChats.length > 0) {
+      setActiveChat(updatedChats[0].id);
+      setMessages(updatedChats[0].messages);
+    } else if (updatedChats.length === 0) {
+      setActiveChat(null);
+      setMessages([]);
+    }
+  };
+
+  const handleEditStart = (chatId, currentTitle) => {
+    setEditChatId(chatId);
+    setEditedTitle(currentTitle);
+  };
+
+  const handleEditSave = (chatId) => {
+    const updatedChats = chats.map(chat =>
+      chat.id === chatId ? { ...chat, title: editedTitle } : chat
+    );
+    setChats(updatedChats);
+    setEditChatId(null);
+    setEditedTitle('');
+  };
+
+  const handleEditCancel = () => {
+    setEditChatId(null);
+    setEditedTitle('');
+  };
+
+  const handleResetChat = () => {
+    setMessages([]);
+    const updatedChats = chats.map(chat =>
+      chat.id === activeChat ? { ...chat, messages: [] } : chat
+    );
+    setChats(updatedChats);
   };
 
   return (
+  <div className={`app-container ${isDarkMode ? 'dark-mode' : ''}`}>
+  <div className="theme-toggle">
+        <label className="switch">
+          <input type="checkbox" checked={isDarkMode} onChange={toggleTheme} />
+          <span className="slider round"></span>
+        </label>
+      </div>
+
+    <div className="sidebar">
+      <button className="new-chat-button" onClick={handleNewChat}>+ New Chat</button>
+      <div className="chat-history">
+        {chats.map(chat => (
+          <div
+            key={chat.id}
+            className={`chat-history-item ${chat.id === activeChat ? 'active' : ''}`}
+            onClick={() => handleChatSelect(chat.id)}
+          >
+            {editChatId === chat.id ? (
+              <div className="edit-chat">
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                />
+                <span className="save-icon" onClick={() => handleEditSave(chat.id)}>✔️</span>
+                <span className="cancel-icon" onClick={handleEditCancel}>❌</span>
+              </div>
+            ) : (
+              <>
+                <span>{chat.title}</span>
+                <div className="chat-actions">
+                  <span
+                    className="edit-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditStart(chat.id, chat.title);
+                    }}
+                  >✏️</span>
+                  <span
+                    className="delete-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleChatDelete(chat.id);
+                    }}
+                  >🗑️</span>
+                </div>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
     <div className="chat-container">
-      <h1>AI Chatbot </h1>
+      <h1>AI Chatbot</h1>
       <div className="chat-box">
         {messages.length === 0 ? (
           <div className="empty-message">No messages yet...</div>
@@ -107,7 +236,9 @@ function Chatbot() {
       </div>
       <button onClick={handleResetChat} className="reset-button">Reset Chat</button>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default Chatbot;
