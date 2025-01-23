@@ -49,7 +49,7 @@ yarn start
 
 ## Credits
 
-This project was created by [Srikar Veluvali](https://github.com/srikarveluvali) as part of a coding challenge.
+This project was created by [Kathirvel](https://skathir45.netlify.app/) as part of a coding challenge.
 
 ## License
 
