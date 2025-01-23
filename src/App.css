@@ -1,5 +1,7 @@
 /* App.css */
 
+/* Base styles for larger screens */
+
 body {
   margin: 0;
   font-family: 'Roboto', sans-serif;
@@ -14,15 +16,14 @@ body {
   justify-content: center;
   height: 100vh;
   padding: 20px;
-  width: 50%; /* Keeps the container width at 90% of the viewport */
-  max-width: 1400px; /* Increased max-width for wider layout */
+  width: 50%;
+  max-width: 1400px;
   margin: 0 auto;
   background: linear-gradient(135deg, #3a7bd5, #3a6073);
   color: #fff;
   box-sizing: border-box;
-  gap: 20px; /* Added some spacing between elements */
+  gap: 20px;
 }
-
 
 h1 {
   font-size: 2rem;
@@ -31,9 +32,8 @@ h1 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
 .chat-box {
-  width: 500rem;
+  width: 100%;
   max-width: 600px;
   background-color: #fff;
   border-radius: 10px;
@@ -42,10 +42,10 @@ h1 {
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* Ensures messages stick to the bottom */
-  height: 60%; /* Set a fixed height to create visible empty space */
-  padding: 10px; /* Adds some inner spacing to look clean */
-  position: relative; /* For absolute positioning of the empty message */
+  justify-content: flex-end;
+  height: 60%;
+  padding: 10px;
+  position: relative;
 }
 
 .empty-message {
@@ -59,26 +59,23 @@ h1 {
   text-align: center;
 }
 
-
-/* Custom scrollbar for WebKit browsers (Chrome, Edge, Safari) */
 .chat-box::-webkit-scrollbar {
-  width: 8px; /* Scrollbar width */
+  width: 8px;
 }
 
 .chat-box::-webkit-scrollbar-thumb {
-  background: #007bff; /* Scrollbar thumb color */
-  border-radius: 10px; /* Rounded scrollbar */
+  background: #007bff;
+  border-radius: 10px;
 }
 
 .chat-box::-webkit-scrollbar-thumb:hover {
-  background: #0056b3; /* Thumb color on hover */
+  background: #0056b3;
 }
 
 .chat-box::-webkit-scrollbar-track {
-  background: #ddd; /* Scrollbar track color */
+  background: #ddd;
 }
 
-/* Ensure text is visible when there's no message */
 .chat-box:empty::before {
   content: "No messages yet...";
   color: #aaa;
@@ -115,9 +112,9 @@ h1 {
 .input-box {
   display: flex;
   align-items: center;
-  gap: 15px; /* Increased gap between input and button */
-  width:40em; /* Increased width */
-  max-width: 900px; /* Adjusted the max-width */
+  gap: 15px;
+  width: 40em;
+  max-width: 900px;
 }
 
 input[type="text"] {
@@ -128,13 +125,12 @@ input[type="text"] {
   border-radius: 10px;
   outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  width: 100%; /* Ensures input takes the full available space */
+  width: 100%;
 }
 
-
 input[type="text"]:focus {
-  border-color: #007bff; /* Change border color on focus */
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Add glow effect */
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
 }
 
 input[type="text"]::placeholder {
@@ -155,10 +151,9 @@ button {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-
 button:hover {
   transform: scale(1.1);
-  background: linear-gradient(135deg, #2575fc, #6a11cb); /* Reverse gradient */
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -171,7 +166,6 @@ button:focus {
   outline: none;
   box-shadow: 0 0 8px rgba(42, 117, 252, 0.6);
 }
-
 
 @keyframes fadeIn {
   from {
@@ -200,3 +194,70 @@ button:focus {
   background-color: #c0392b;
 }
 
+/* Media Queries for Responsiveness */
+
+/* Mobile (Portrait) */
+@media (max-width: 600px) {
+  .chat-container {
+    width: 100%;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .chat-box {
+    height: 50%;
+    max-width: 100%;
+  }
+
+  .input-box {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .reset-button {
+    width: 100%;
+    margin-top: 15px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .chat-container {
+    width: 80%;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .chat-box {
+    height: 50%;
+  }
+
+  .input-box {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .chat-container {
+    width: 40%;
+  }
+}
