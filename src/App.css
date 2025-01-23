@@ -1,0 +1,202 @@
+/* App.css */
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+  width: 50%; /* Keeps the container width at 90% of the viewport */
+  max-width: 1400px; /* Increased max-width for wider layout */
+  margin: 0 auto;
+  background: linear-gradient(135deg, #3a7bd5, #3a6073);
+  color: #fff;
+  box-sizing: border-box;
+  gap: 20px; /* Added some spacing between elements */
+}
+
+
+h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 0 20px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+
+.chat-box {
+  width: 500rem;
+  max-width: 600px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Ensures messages stick to the bottom */
+  height: 60%; /* Set a fixed height to create visible empty space */
+  padding: 10px; /* Adds some inner spacing to look clean */
+  position: relative; /* For absolute positioning of the empty message */
+}
+
+.empty-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #aaa;
+  font-style: italic;
+  font-size: 18px;
+  text-align: center;
+}
+
+
+/* Custom scrollbar for WebKit browsers (Chrome, Edge, Safari) */
+.chat-box::-webkit-scrollbar {
+  width: 8px; /* Scrollbar width */
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+  background: #007bff; /* Scrollbar thumb color */
+  border-radius: 10px; /* Rounded scrollbar */
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+  background: #0056b3; /* Thumb color on hover */
+}
+
+.chat-box::-webkit-scrollbar-track {
+  background: #ddd; /* Scrollbar track color */
+}
+
+/* Ensure text is visible when there's no message */
+.chat-box:empty::before {
+  content: "No messages yet...";
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+  width: 100%;
+  margin-top: auto;
+}
+
+.message {
+  padding: 12px 20px;
+  margin: 10px 0;
+  border-radius: 20px;
+  font-size: 1rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user {
+  background-color: #4caf50;
+  color: #fff;
+  align-self: flex-end;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.bot {
+  background-color: #f44336;
+  color: #fff;
+  align-self: flex-start;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Increased gap between input and button */
+  width:40em; /* Increased width */
+  max-width: 900px; /* Adjusted the max-width */
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 15px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%; /* Ensures input takes the full available space */
+}
+
+
+input[type="text"]:focus {
+  border-color: #007bff; /* Change border color on focus */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3); /* Add glow effect */
+}
+
+input[type="text"]::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+button:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #2575fc, #6a11cb); /* Reverse gradient */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(42, 117, 252, 0.6);
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reset-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #e74c3c;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+.reset-button:hover {
+  background-color: #c0392b;
+}
+
